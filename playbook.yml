@@ -1,0 +1,26 @@
+---
+
+- name: My play
+  hosts: all
+  tasks:
+   - name: vs2022 | Check if Visual Studio 2022 Build Tools are installed
+     win_stat: path='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Auxiliary/Build/vcvarsall.bat'
+     register: vs2022_installed
+
+   - name: vs2022 | Check if Visual Studio 2022 Build Tools are installed
+     win_stat: path='G:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Auxiliary/Build/vcvarsall.bat'
+     register: vs2022_installed
+
+
+
+   - name: vs2022 | Download the Visual Studio 2022 Build Tools installer
+     win_get_url:
+       url: 'https://aka.ms/vs/17/release/vs_BuildTools.exe'
+       dest: "{{ ansible_user_dir }}\\Downloads\\vs_buildtools-2022.exe"
+     when: not vs2022_installed.stat.exists
+
+
+
+   - name: vs2022 | Install Visual Studio 2022 Build Tools
+     raw: "{{ ansible_user_dir }}\\Downloads\\vs_buildtools-2022.exe --quiet --wait --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools --includeRecommended --includeOptional"
+     when: not vs2022_installed.stat.exists
